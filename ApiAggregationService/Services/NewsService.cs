@@ -12,14 +12,12 @@ public class NewsService(
 {
     private readonly IHttpClientFactory _clientFactory = clientFactory;
     private readonly ILogger<NewsService> _logger = logger;
-    //private readonly IStatisticsService _statisticsService = statisticsService;
     private const string NewsApiUrl = "https://newsapi.org/v2";
     private readonly string _apiKey = Environment.GetEnvironmentVariable("NewsApiKey");
 
     public async Task<IEnumerable<AggregatedData>> FetchNewsDataAsync()
     {
         var client = _clientFactory.CreateClient();
-        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -30,9 +28,6 @@ public class NewsService(
 
             var url = $"https://newsapi.org/v2/top-headlines?country=us&apiKey={_apiKey}";
             var response = await client.GetAsync(url);
-
-            stopwatch.Stop();
-            //_statisticsService.RecordApiCall("NewsAPI", stopwatch.ElapsedMilliseconds);
 
             if (!response.IsSuccessStatusCode)
             {

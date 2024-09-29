@@ -17,15 +17,11 @@ public class WeatherService(
     public async Task<IEnumerable<AggregatedData>> FetchWeatherDataAsync()
     {
         var client = _clientFactory.CreateClient();
-        var stopwatch = Stopwatch.StartNew();
         try
         {
             var response = await client.GetAsync($"{WeatherApiUrl}?q=London&appid={_apiKey}&units=metric");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-
-            stopwatch.Stop();
-            //_statisticsService.RecordApiCall("OpenWeatherMap", stopwatch.ElapsedMilliseconds);
 
             var weatherData = JsonConvert.DeserializeObject<WeatherData>(content);
             return
@@ -49,5 +45,3 @@ public class WeatherService(
         }
     }
 }
-
-
