@@ -1,0 +1,64 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Aa][rR][tT][iI][fF][aA][cC][tT][sS]/
+[Bb]in/
+[Oo]bj/
+[Ll]ogs/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+.history/
+
+# Rider settings
+.idea/
+
+# Other generated files
+project.lock.json
+project.fragment.lock.json
+*.db
+*.pdb
+*.exe
+*.dll
+*.so
+*.app
+*.dSYM/
+*.o
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+!**/packages/build/PackageId/
+
+# ASP.NET Core specific files
+wwwroot/lib/
+wwwroot/css/
+wwwroot/js/
+
+# Local Development files
+appsettings.Development.json
+appsettings.*.json
+*.db
+
+# Visual Studio temporary files
+*.vs/
+*.vscode/
+*.sln.ide/
+
+# Ignore environment variable file
+.env
+
+*.suo
+*.user
+_ReSharper.*
+bin
+obj
+packages
