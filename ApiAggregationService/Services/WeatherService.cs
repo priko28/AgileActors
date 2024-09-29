@@ -1,31 +1,42 @@
 ﻿using AggregationService.Abstractions;
 using AggregationService.Models.Response;
 using Newtonsoft.Json;
-using System.Diagnostics;
 
 namespace AggregationService.Services;
 
 public class WeatherService(
     IHttpClientFactory clientFactory,
     ILogger<WeatherService> logger,
-    IConfiguration configuration) : IWeatherService
+    ICacheService cacheService) : IWeatherService
 {
     private readonly IHttpClientFactory _clientFactory = clientFactory;
     private readonly ILogger<WeatherService> _logger = logger;
+    private readonly ICacheService _cacheService = cacheService;
+
     private readonly string _apiKey = Environment.GetEnvironmentVariable("WeatherApiKey");
     private const string WeatherApiUrl = "https://api.openweathermap.org/data/2.5/weather";
     public async Task<IEnumerable<AggregatedData>> FetchWeatherDataAsync()
     {
         var client = _clientFactory.CreateClient();
+        var requestUrl = $"{WeatherApiUrl}?q=London&appid={_apiKey}&units=metric";
+
+        var cachedResult = _cacheService.Get<IEnumerable<AggregatedData>>(requestUrl);
+
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         try
         {
-            var response = await client.GetAsync($"{WeatherApiUrl}?q=London&appid={_apiKey}&units=metric");
+            var response = await client.GetAsync(requestUrl);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
 
             var weatherData = JsonConvert.DeserializeObject<WeatherData>(content);
-            return
-            [
+
+            var result = new[]
+            {
                 new AggregatedData
                 {
                     Source = "OpenWeatherMap",
@@ -36,7 +47,11 @@ public class WeatherService(
                            $"Humidity: {weatherData.Main.Humidity}%, " +
                            $"Description: {weatherData.Weather[0].Description}"
                 }
-            ];
+            };
+
+            _cacheService.Set(requestUrl, result, TimeSpan.FromHours(2));
+
+            return result;
         }
         catch (Exception ex)
         {

@@ -15,11 +15,11 @@ namespace AggregationService
             services.AddMemoryCache();
 
             services
-                .AddScoped<IMemoryCache, MemoryCache>()
-                .AddScoped<ICacheService, CacheService>()
-                .AddSingleton<IWeatherService, WeatherService>()
-                .AddSingleton<INewsService, NewsService>()
-                .AddSingleton<IGitHubService, GitHubService>()
+                .AddSingleton<IMemoryCache, MemoryCache>()
+                .AddSingleton<ICacheService, CacheService>()
+                .AddScoped<IWeatherService, WeatherService>()
+                .AddScoped<INewsService, NewsService>()
+                .AddScoped<IGitHubService, GitHubService>()
                 .AddScoped<IAggregatorService, AggregatorService>();
 
             return services;

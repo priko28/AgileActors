@@ -1,17 +1,18 @@
 ﻿using AggregationService.Abstractions;
 using AggregationService.Models.Response;
 using Newtonsoft.Json;
-using System.Diagnostics;
 
 namespace AggregationService.Services;
 
 public class NewsService(
     IHttpClientFactory clientFactory,
     ILogger<NewsService> logger,
-    IConfiguration configuration) : INewsService
+    ICacheService cacheService) : INewsService
 {
     private readonly IHttpClientFactory _clientFactory = clientFactory;
     private readonly ILogger<NewsService> _logger = logger;
+    private readonly ICacheService _cacheService = cacheService;
+
     private const string NewsApiUrl = "https://newsapi.org/v2";
     private readonly string _apiKey = Environment.GetEnvironmentVariable("NewsApiKey");
 
@@ -19,15 +20,18 @@ public class NewsService(
     {
         var client = _clientFactory.CreateClient();
 
+        var requestUrl = $"https://newsapi.org/v2/top-headlines?country=us&apiKey={_apiKey}";
+
+        var cachedResult = _cacheService.Get<IEnumerable<AggregatedData>>(requestUrl);
+
+        if (cachedResult is not null)
+        {
+            return cachedResult;
+        }
+
         try
         {
-            if (string.IsNullOrEmpty(_apiKey))
-            {
-                throw new InvalidOperationException("News API key is not configured.");
-            }
-
-            var url = $"https://newsapi.org/v2/top-headlines?country=us&apiKey={_apiKey}";
-            var response = await client.GetAsync(url);
+            var response = await client.GetAsync(requestUrl);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -45,13 +49,17 @@ public class NewsService(
                 return Enumerable.Empty<AggregatedData>();
             }
 
-            return newsData.Articles.Select(article => new AggregatedData
+            var result = newsData.Articles.Select(article => new AggregatedData
             {
                 Source = "NewsAPI",
                 Category = "News",
                 Date = article.PublishedAt,
                 Data = $"{article.Title} - {article.Description}"
             });
+
+            _cacheService.Set(requestUrl, result, TimeSpan.FromHours(2));
+
+            return result;
         }
         catch (HttpRequestException ex)
         {
