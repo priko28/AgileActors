@@ -18,8 +18,6 @@ public class NewsService(
 
     public async Task<IEnumerable<AggregatedData>> FetchNewsDataAsync()
     {
-        var client = _clientFactory.CreateClient();
-
         var requestUrl = $"https://newsapi.org/v2/top-headlines?country=us&apiKey={_apiKey}";
 
         var cachedResult = _cacheService.Get<IEnumerable<AggregatedData>>(requestUrl);
@@ -28,6 +26,8 @@ public class NewsService(
         {
             return cachedResult;
         }
+
+        var client = _clientFactory.CreateClient();
 
         try
         {

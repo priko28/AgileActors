@@ -3,18 +3,11 @@ using AggregationService.Models.Response;
 
 namespace AggregationService.Services;
 
-public class AggregatorService : IAggregatorService
+public class AggregatorService(IWeatherService weatherService, INewsService newsService, IGitHubService gitHubService) : IAggregatorService
 {
-    private readonly IWeatherService _weatherService;
-    private readonly INewsService _newsService;
-    private readonly IGitHubService _gitHubService;
-
-    public AggregatorService(IWeatherService weatherService, INewsService newsService, IGitHubService gitHubService)
-    {
-        _weatherService = weatherService;
-        _newsService = newsService;
-        _gitHubService = gitHubService;
-    }
+    private readonly IWeatherService _weatherService = weatherService;
+    private readonly INewsService _newsService = newsService;
+    private readonly IGitHubService _gitHubService = gitHubService;
 
     public async Task<IEnumerable<AggregatedData>> GetAggregatedDataAsync(
         string filter = null,

@@ -15,8 +15,8 @@ public class GitHubService(
 
     public async Task<IEnumerable<AggregatedData>> FetchGitHubDataAsync()
     {
-        var client = _clientFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "ApiAggregationService");
+       
+        
         var requestUrl = "https://api.github.com/search/repositories?q=language:csharp&sort=stars&order=desc";
 
         var cachedResult = _cacheService.Get<IEnumerable<AggregatedData>>(requestUrl);
@@ -25,7 +25,8 @@ public class GitHubService(
         {
             return cachedResult;
         }
-
+        var client = _clientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "ApiAggregationService");
         try
         {
             var response = await client.GetAsync(requestUrl);

@@ -17,7 +17,7 @@ public class WeatherService(
     private const string WeatherApiUrl = "https://api.openweathermap.org/data/2.5/weather";
     public async Task<IEnumerable<AggregatedData>> FetchWeatherDataAsync()
     {
-        var client = _clientFactory.CreateClient();
+       
         var requestUrl = $"{WeatherApiUrl}?q=London&appid={_apiKey}&units=metric";
 
         var cachedResult = _cacheService.Get<IEnumerable<AggregatedData>>(requestUrl);
@@ -26,6 +26,7 @@ public class WeatherService(
         {
             return cachedResult;
         }
+        var client = _clientFactory.CreateClient();
 
         try
         {
